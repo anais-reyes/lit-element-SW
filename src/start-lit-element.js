@@ -10,7 +10,8 @@
 
 
 // Import LitElement base class and html helper function
-import { LitElement, html } from 'lit-element';
+import { LitElement, html, css } from 'lit-element';
+
 
 export class StartLitElement extends LitElement {
   /**
@@ -20,7 +21,8 @@ export class StartLitElement extends LitElement {
   static get properties() {
     return {
       message: { type: String },
-      pie: { type: Boolean }
+      pie: { type: Boolean },
+      characters: { type: Array}
     };
   }
 
@@ -30,12 +32,45 @@ export class StartLitElement extends LitElement {
   constructor() {
     // Must call superconstructor first.
     super();
-
     // Initialize properties
     this.loadComplete = false;
-    this.message = 'Hello World from LitElement';
-    this.pie = false;
+    this.characters = null;
   }
+
+  static get styles() {
+    return css`
+    .page {
+      background: black;
+      margin: -8px;
+    }
+    .logo {
+      height: 180px;
+      width: auto;
+      display: block;
+      margin: auto;
+    }
+    .container {
+      background: black;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-column-gap: 10px;
+      grid-row-gap: 10px;
+    }
+    .character {
+      padding: 10px;
+      
+    }
+
+    .character img {
+      display: block;
+      margin: auto;
+    }
+    .character p {
+      color: white;
+      text-align: center;
+    }
+    `
+  } 
 
   /**
    * Define a template for the new element by implementing LitElement's
@@ -47,18 +82,24 @@ export class StartLitElement extends LitElement {
         :host { display: block; }
         :host([hidden]) { display: none; }
       </style>
+      <section class="page">
+      <img class="logo" src="../assets/logo.png"/>
+      <div class="container">
+      ${this.characters ?
+        this.characters.data.allPersons.map((character, index) => {
+          const characterIndex = index + 1; 
+          return html`
+            <section class="character">
+              <img src="https://starwars-visualguide.com/assets/img/characters/${characterIndex}.jpg"/>
+              <p>Name: ${character.name}</p>
+              <p>Height: ${character.height} cm</p>
 
-      <h1>Start LitElement!</h1>
-      <p>${this.message}</p>
+            </section>
+        `}) :
+        html`<p> Loading Star Wars Characters...</p>`}
+        </div>
+        </section>
 
-      <input name="myinput" id="myinput" 
-        type="checkbox"
-        ?checked="${this.pie}"
-        @change="${this.togglePie}">
-
-      <label for="myinput">I like pie.</label>
-      
-      ${this.pie ? html`<lazy-element></lazy-element>` : html``}
     `;
   }
 
@@ -69,9 +110,7 @@ export class StartLitElement extends LitElement {
    */
   firstUpdated() {
     this.loadLazy();
-
     const myInput = this.shadowRoot.getElementById('myinput');
-    myInput.focus();
   }
 
   /**
@@ -89,6 +128,13 @@ export class StartLitElement extends LitElement {
    * load it and remember that we loaded it.
    */
   async loadLazy() {
+    fetch('https://swapi.graph.cool', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query: '{ allPersons { name, eyeColor, hairColor, height } }' }),
+    })
+      .then(res => res.json())
+      .then(res => {this.characters = res; console.log(res.data)});
     console.log('loadLazy');
     if(this.pie && !this.loadComplete) {
       return import('./lazy-element.js').then((LazyElement) => {
@@ -101,6 +147,9 @@ export class StartLitElement extends LitElement {
     }
   }
 }
+
+
+
 
 // Register the element with the browser
 customElements.define('start-lit-element', StartLitElement);
