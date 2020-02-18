@@ -32,9 +32,8 @@ export class StartLitElement extends LitElement {
     .container {
       background: black;
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      grid-column-gap: 10px;
-      grid-row-gap: 10px;
+      grid-template-columns: repeat(5, 1fr);
+      padding: 30px;
     }
     
     `
@@ -50,12 +49,18 @@ export class StartLitElement extends LitElement {
       <img class="logo" src="../assets/logo.png"/>
       <div class="container">
       ${this.characters ?
-        this.characters.data.allPersons.map((character, index) => {
-          const characterIndex = index + 1; 
-          return html`
-          <character-element data-character="${characterIndex}" .character=${character} .characterIndex=${characterIndex} @click=${this.handleClick} }></character-element>
-         
-        `}) :
+        this.characters.data.allPersons.map((character, characterIndex) => {
+          if(characterIndex < 16) {
+            return html`
+          <character-element data-character="${characterIndex + 1}" .character=${character} .characterIndex=${characterIndex} @click=${this.handleClick} }></character-element>   
+        `
+          }
+          else if(characterIndex > 16) {
+            return html`
+          <character-element data-character="${characterIndex + 2}" .character=${character} .characterIndex=${characterIndex + 1} @click=${this.handleClick} }></character-element>   
+        `
+          }
+          }) :
         html`<p> Loading Star Wars Characters...</p>`}
         </div>
         </section>
@@ -63,12 +68,14 @@ export class StartLitElement extends LitElement {
   }
 
   handleClick(e) {
-    console.log('click', this.characters.data.allPersons[e.target.dataset.character - 1], e.target.dataset.character)
+    console.log('click', this.characters.data.allPersons[e.target.dataset.character - 1], e.target.dataset.character);
+    alert(this.characters.data.allPersons[e.target.dataset.character - 1].name)
   }
 
   firstUpdated() {
     this.loadLazy();
     console.log('init')
+    
   }
 
   async loadLazy() {

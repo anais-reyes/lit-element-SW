@@ -20,34 +20,56 @@ export class CharacterElement extends LitElement {
         .character {
             padding: 10px;
             margin: 1px solid white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
           }
           .character img {
             display: block;
             margin: auto;
+            width: 200px;
+            border-top-left-radius: 5px;
+            border-top-rigth-radius: 5px;
           }
-          .character p {
-            color: white;
+
+          .character div {
+              background: white;
+              width: 200px;
+              height: 40px;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              border-bottom-left-radius: 5px;
+              border-bottom-right-radius: 5px;
+          }
+          .character div p {
+            color: gray;
             text-align: center;
             font-family: arial;
+            margin: 0;
+            font-family: 'Open Sans', sans-serif;
+           
+            
           }
           `
     }
 
     render() {
+       
         return html`
         <style>
             :host { display: block; }
             :host([hidden]) { display: none; }
         </style>
         <section class="character">
-        <img src="https://starwars-visualguide.com/assets/img/characters/${this.characterIndex}.jpg"/>
-        <p>Name: ${this.character.name}</p>
-        <p>Height: ${this.character.height} cm</p>
-        ${this.character.hairColor ? html`<p>Hair color: ${this.character.hairColor[0].toLowerCase()}</p>` :
-        html``
-        }
-        ${this.character.eyeColor ? html`<p>Eye Color: ${this.character.eyeColor[0].toLowerCase()}</p>` : 
-        html``
+        
+
+
+      
+        <img src="https://starwars-visualguide.com/assets/img/characters/${this.characterIndex + 1}.jpg"/>
+        <div><p>${this.character.name}</p></div>
+        
+       
         }
       </section>
        
